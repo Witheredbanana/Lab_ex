@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if book %}Редактирование книги{% else %}Добавление книги{% endif %} - Электронная библиотека
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    {% if book %}Редактирование книги{% else %}Добавление книги{% endif %}
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Название</label>
+                        <input type="text" class="form-control" id="title" name="title" 
+                               value="{{ book.title if book else '' }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="author" class="form-label">Автор</label>
+                        <input type="text" class="form-control" id="author" name="author" 
+                               value="{{ book.author if book else '' }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="year" class="form-label">Год издания</label>
+                        <input type="number" class="form-control" id="year" name="year" 
+                               value="{{ book.year if book else '' }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="publisher" class="form-label">Издательство</label>
+                        <input type="text" class="form-control" id="publisher" name="publisher" 
+                               value="{{ book.publisher if book else '' }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="pages" class="form-label">Объем (в страницах)</label>
+                        <input type="number" class="form-control" id="pages" name="pages" 
+                               value="{{ book.pages if book else '' }}" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="genres" class="form-label">Жанры</label>
+                        <select class="form-select" id="genres" name="genres" multiple required>
+                            {% for genre in genres %}
+                            <option value="{{ genre.id }}" 
+                                    {% if book and genre in book.genres %}selected{% endif %}>
+                                {{ genre.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Описание</label>
+                        <textarea class="form-control" id="description" name="description" required>{{ book.description if book else '' }}</textarea>
+                    </div>
+
+                    {% if not book %}
+                    <div class="mb-3">
+                        <label for="cover" class="form-label">Обложка</label>
+                        <input type="file" class="form-control" id="cover" name="cover" accept="image/*" required>
+                    </div>
+                    {% endif %}
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            {% if book %}Сохранить изменения{% else %}Добавить книгу{% endif %}
+                        </button>
+                        <a href="{{ url_for('index') }}" class="btn btn-secondary">Отмена</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+<script>
+    const easyMDE = new EasyMDE({
+        element: document.getElementById('description'),
+        spellChecker: false,
+        status: false,
+        toolbar: ['bold', 'italic', 'heading', '|', 'quote', 'unordered-list', 'ordered-list', '|', 'link', 'image', '|', 'preview'],
+    });
+</script>
+{% endblock %} 

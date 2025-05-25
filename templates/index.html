@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+
+{% block title %}Главная - Электронная библиотека{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card-img-top {
+        height: 400px;
+        object-fit: contain;
+        background-color: #f8f9fa;
+        padding: 10px;
+    }
+    .card {
+        transition: transform 0.2s;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    .rating {
+        color: #ffc107;
+    }
+    .review-count {
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Популярные книги -->
+    <div class="mb-5">
+        <h2>Популярные книги</h2>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for book, visit_count, avg_rating, review_count in popular_books %}
+            <div class="col">
+                <div class="card h-100">
+                    {% if book.cover %}
+                    <img src="{{ url_for('static', filename='uploads/' + book.cover.filename) }}" 
+                         class="card-img-top" alt="{{ book.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ book.title }}</h5>
+                        <p class="card-text text-muted">{{ book.author }}</p>
+                        <p class="card-text">
+                            <small class="text-muted">
+                                Просмотров: {{ visit_count }}<br>
+                                {% if avg_rating %}
+                                <span class="rating">★ {{ "%.1f"|format(avg_rating) }}</span>
+                                <span class="review-count">({{ review_count }} рецензий)</span>
+                                {% else %}
+                                <span class="text-muted">Нет оценок</span>
+                                {% endif %}
+                            </small>
+                        </p>
+                        <a href="{{ url_for('view_book', book_id=book.id) }}" class="btn btn-primary">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Недавно просмотренные книги -->
+    {% if recent_visits %}
+    <div class="mb-5">
+        <h2>Недавно просмотренные</h2>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for visit in recent_visits %}
+            <div class="col">
+                <div class="card h-100">
+                    {% if visit.book.cover %}
+                    <img src="{{ url_for('static', filename='uploads/' + visit.book.cover.filename) }}" 
+                         class="card-img-top" alt="{{ visit.book.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ visit.book.title }}</h5>
+                        <p class="card-text text-muted">{{ visit.book.author }}</p>
+                        <p class="card-text">
+                            <small class="text-muted">
+                                Просмотрено: {{ visit.visit_date.strftime('%d.%m.%Y %H:%M') }}<br>
+                                {% set avg_rating = visit.book.reviews|map(attribute='rating')|list|sum / visit.book.reviews|length if visit.book.reviews else 0 %}
+                                {% if visit.book.reviews %}
+                                <span class="rating">★ {{ "%.1f"|format(avg_rating) }}</span>
+                                <span class="review-count">({{ visit.book.reviews|length }} рецензий)</span>
+                                {% else %}
+                                <span class="text-muted">Нет оценок</span>
+                                {% endif %}
+                            </small>
+                        </p>
+                        <a href="{{ url_for('view_book', book_id=visit.book.id) }}" class="btn btn-primary">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Список всех книг -->
+    <div class="mb-5">
+        <h2>Все книги</h2>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for book, avg_rating, review_count in books.items %}
+            <div class="col">
+                <div class="card h-100">
+                    {% if book.cover %}
+                    <img src="{{ url_for('static', filename='uploads/' + book.cover.filename) }}" 
+                         class="card-img-top" alt="{{ book.title }}">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ book.title }}</h5>
+                        <p class="card-text text-muted">{{ book.author }}</p>
+                        <p class="card-text">
+                            <small class="text-muted">
+                                {% if avg_rating %}
+                                <span class="rating">★ {{ "%.1f"|format(avg_rating) }}</span>
+                                <span class="review-count">({{ review_count }} рецензий)</span>
+                                {% else %}
+                                <span class="text-muted">Нет оценок</span>
+                                {% endif %}
+                            </small>
+                        </p>
+                        <a href="{{ url_for('view_book', book_id=book.id) }}" class="btn btn-primary">Подробнее</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Пагинация -->
+        {% if books.pages > 1 %}
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if books.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('index', page=books.prev_num) }}">Предыдущая</a>
+                </li>
+                {% endif %}
+                
+                {% for page_num in books.iter_pages() %}
+                    {% if page_num %}
+                        <li class="page-item {% if page_num == books.page %}active{% endif %}">
+                            <a class="page-link" href="{{ url_for('index', page=page_num) }}">{{ page_num }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                {% if books.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('index', page=books.next_num) }}">Следующая</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

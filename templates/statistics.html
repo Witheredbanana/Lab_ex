@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+
+{% block title %}Статистика - Электронная библиотека{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Статистика</h2>
+
+    <!-- Вкладки -->
+    <ul class="nav nav-tabs mb-4" id="statisticsTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="user-actions-tab" data-bs-toggle="tab" data-bs-target="#user-actions" type="button" role="tab">
+                Журнал действий пользователей
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="book-stats-tab" data-bs-toggle="tab" data-bs-target="#book-stats" type="button" role="tab">
+                Статистика просмотра книг
+            </button>
+        </li>
+    </ul>
+
+    <!-- Содержимое вкладок -->
+    <div class="tab-content" id="statisticsTabsContent">
+        <!-- Журнал действий пользователей -->
+        <div class="tab-pane fade show active" id="user-actions" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3>Журнал действий пользователей</h3>
+                <a href="{{ url_for('export_user_actions') }}" class="btn btn-success">
+                    <i class="fas fa-file-export"></i> Экспорт в CSV
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>ФИО пользователя</th>
+                            <th>Название книги</th>
+                            <th>Дата и время просмотра</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for visit, book, user in user_actions.items %}
+                        <tr>
+                            <td>{{ loop.index + (user_actions.page - 1) * user_actions.per_page }}</td>
+                            <td>{{ user.last_name }} {{ user.first_name }} {% if not user %}Неаутентифицированный пользователь{% endif %}</td>
+                            <td>{{ book.title }}</td>
+                            <td>{{ visit.visit_date.strftime('%d.%m.%Y %H:%M') }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Пагинация -->
+            {% if user_actions.pages > 1 %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if user_actions.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('statistics', page=user_actions.prev_num) }}">Предыдущая</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for page_num in user_actions.iter_pages() %}
+                        {% if page_num %}
+                            <li class="page-item {% if page_num == user_actions.page %}active{% endif %}">
+                                <a class="page-link" href="{{ url_for('statistics', page=page_num) }}">{{ page_num }}</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if user_actions.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('statistics', page=user_actions.next_num) }}">Следующая</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+
+        <!-- Статистика просмотра книг -->
+        <div class="tab-pane fade" id="book-stats" role="tabpanel">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3>Статистика просмотра книг</h3>
+                <a href="{{ url_for('export_book_stats', date_from=date_from, date_to=date_to) }}" class="btn btn-success">
+                    <i class="fas fa-file-export"></i> Экспорт в CSV
+                </a>
+            </div>
+
+            <!-- Фильтры -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="GET" class="row g-3">
+                        <div class="col-md-4">
+                            <label for="date_from" class="form-label">Дата с</label>
+                            <input type="date" class="form-control" id="date_from" name="date_from" value="{{ date_from }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="date_to" class="form-label">Дата по</label>
+                            <input type="date" class="form-control" id="date_to" name="date_to" value="{{ date_to }}">
+                        </div>
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">Применить</button>
+                            <a href="{{ url_for('statistics') }}" class="btn btn-secondary">Сбросить</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Название книги</th>
+                            <th>Автор</th>
+                            <th>Год издания</th>
+                            <th>Количество просмотров</th>
+                            <th>Средний рейтинг</th>
+                            <th>Количество рецензий</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for book, visit_count, avg_rating, review_count in book_stats.items %}
+                        <tr>
+                            <td>{{ loop.index + (book_stats.page - 1) * book_stats.per_page }}</td>
+                            <td>{{ book.title }}</td>
+                            <td>{{ book.author }}</td>
+                            <td>{{ book.year }}</td>
+                            <td>{{ visit_count }}</td>
+                            <td>
+                                {% if avg_rating %}
+                                    <span class="text-warning">★ {{ "%.1f"|format(avg_rating) }}</span>
+                                {% else %}
+                                    <span class="text-muted">Нет оценок</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ review_count }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Пагинация -->
+            {% if book_stats.pages > 1 %}
+            <nav class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if book_stats.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('statistics', page=book_stats.prev_num, date_from=date_from, date_to=date_to) }}">Предыдущая</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for page_num in book_stats.iter_pages() %}
+                        {% if page_num %}
+                            <li class="page-item {% if page_num == book_stats.page %}active{% endif %}">
+                                <a class="page-link" href="{{ url_for('statistics', page=page_num, date_from=date_from, date_to=date_to) }}">{{ page_num }}</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">...</span>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if book_stats.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('statistics', page=book_stats.next_num, date_from=date_from, date_to=date_to) }}">Следующая</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

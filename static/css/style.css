@@ -1,0 +1,205 @@
+/* Общие стили */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.footer {
+    margin-top: auto;
+}
+
+/* Стили для карточек книг */
+.card-img-top {
+    height: 300px;
+    object-fit: cover;
+}
+
+/* Стили для форм */
+.form-label {
+    font-weight: 500;
+}
+
+/* Стили для навигации */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+}
+
+/* Стили для модальных окон */
+.modal-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
+
+/* Стили для рецензий */
+.review-card {
+    border-left: 4px solid #007bff;
+    margin-bottom: 1rem;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.review-rating {
+    font-weight: bold;
+    color: #28a745;
+}
+
+/* Стили для пагинации */
+.pagination {
+    margin-bottom: 2rem;
+}
+
+/* Стили для статистики */
+.stats-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1);
+    margin-bottom: 1rem;
+}
+
+.stats-header {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px 8px 0 0;
+}
+
+.stats-body {
+    padding: 1rem;
+}
+
+/* Стили для поиска */
+.search-form {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+/* Стили для подборок */
+.collection-card {
+    transition: transform 0.2s;
+}
+
+.collection-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Стили для модерации */
+.moderate-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Стили для уведомлений */
+.alert {
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Стили для профиля */
+.profile-header {
+    background-color: #f8f9fa;
+    padding: 2rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+/* Стили для кнопок */
+.btn-group {
+    gap: 0.5rem;
+}
+
+/* Стили для таблиц */
+.table th {
+    background-color: #f8f9fa;
+}
+
+/* Стили для загрузки файлов */
+.file-upload {
+    border: 2px dashed #dee2e6;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+}
+
+.file-upload:hover {
+    border-color: #007bff;
+}
+
+/* Стили для рейтинга */
+.rating-stars {
+    color: #ffc107;
+    font-size: 1.2rem;
+}
+
+/* Стили для описания */
+.book-description {
+    white-space: pre-wrap;
+    line-height: 1.6;
+}
+
+/* Стили для жанров */
+.genre-badge {
+    background-color: #e9ecef;
+    color: #495057;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+}
+
+/* Стили для комментариев */
+.comment-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Стили для статистики просмотров */
+.view-stats {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+/* Стили для экспорта */
+.export-button {
+    margin-bottom: 1rem;
+}
+
+/* Стили для фильтров */
+.filter-section {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+/* Стили для сортировки */
+.sort-options {
+    margin-bottom: 1rem;
+}
+
+/* Стили для анимаций */
+.fade-enter {
+    opacity: 0;
+}
+
+.fade-enter-active {
+    opacity: 1;
+    transition: opacity 0.3s ease-in;
+}
+
+.fade-exit {
+    opacity: 1;
+}
+
+.fade-exit-active {
+    opacity: 0;
+    transition: opacity 0.3s ease-out;
+} 

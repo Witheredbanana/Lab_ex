@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}{{ book.title }} - Электронная библиотека{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <!-- Обложка книги -->
+        <div class="col-md-4">
+            {% if book.cover %}
+            <img src="{{ url_for('static', filename='uploads/' + book.cover.filename) }}" 
+                 class="img-fluid rounded" alt="{{ book.title }}"
+                 onerror="this.onerror=null; this.src='{{ url_for('static', filename='css/no-cover.jpg') }}';">
+            {% else %}
+            <div class="bg-light rounded p-5 text-center">
+                <i class="fas fa-book fa-5x text-muted"></i>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Информация о книге -->
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <h1>{{ book.title }}</h1>
+                {% if current_user.is_authenticated and current_user.role.name == 'Администратор' %}
+                <div class="btn-group">
+                    <a href="{{ url_for('edit_book', book_id=book.id) }}" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Редактировать
+                    </a>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteBookModal">
+                        <i class="fas fa-trash"></i> Удалить
+                    </button>
+                </div>
+                {% endif %}
+            </div>
+            <div class="mb-4">
+                <h5>Автор</h5>
+                <p>{{ book.author }}</p>
+            </div>
+            <div class="mb-4">
+                <h5>Издательство</h5>
+                <p>{{ book.publisher }}</p>
+            </div>
+            <div class="mb-4">
+                <h5>Год издания</h5>
+                <p>{{ book.year }}</p>
+            </div>
+            <div class="mb-4">
+                <h5>Количество страниц</h5>
+                <p>{{ book.pages }}</p>
+            </div>
+            <div class="mb-4">
+                <h5>Жанры</h5>
+                <p>
+                    {% for genre in book.genres %}
+                        <span class="badge bg-secondary me-1">{{ genre.name }}</span>
+                    {% endfor %}
+                </p>
+            </div>
+            <div class="mb-4">
+                <h5>Описание</h5>
+                <p>{{ book.description }}</p>
+            </div>
+
+            <!-- Рецензии -->
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5>Рецензии</h5>
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('add_review', book_id=book.id) }}" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Добавить рецензию
+                        </a>
+                    {% endif %}
+                </div>
+
+                {% if book.reviews %}
+                    {% for review in book.reviews %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h6 class="card-subtitle text-muted">
+                                    {{ review.user.last_name }} {{ review.user.first_name }}
+                                </h6>
+                                <div class="text-warning">
+                                    {% for i in range(review.rating) %}
+                                        <i class="fas fa-star"></i>
+                                    {% endfor %}
+                                    {% for i in range(5 - review.rating) %}
+                                        <i class="far fa-star"></i>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <p class="card-text">{{ review.text }}</p>
+                            <small class="text-muted">
+                                {{ review.created_at.strftime('%d.%m.%Y %H:%M') }}
+                            </small>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">
+                        Пока нет рецензий на эту книгу.
+                        {% if not current_user.is_authenticated %}
+                            <a href="{{ url_for('login') }}" class="alert-link">Войдите</a>, чтобы оставить рецензию.
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Модальное окно подтверждения удаления -->
+{% if current_user.is_authenticated and current_user.role.name == 'Администратор' %}
+<div class="modal fade" id="deleteBookModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Подтверждение удаления</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Вы уверены, что хотите удалить книгу "{{ book.title }}"?</p>
+                <p class="text-danger">Это действие нельзя отменить!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                <form action="{{ url_for('delete_book', book_id=book.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-danger">Удалить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %} 

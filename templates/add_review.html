@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Добавление рецензии - Электронная библиотека{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Добавить рецензию на книгу "{{ book.title }}"</h2>
+    
+    <form method="POST" class="mt-4" id="reviewForm">
+        <div class="mb-3">
+            <label for="rating" class="form-label">Оценка</label>
+            <select class="form-select" id="rating" name="rating" required>
+                <option value="">Выберите оценку</option>
+                <option value="1">1 - Очень плохо</option>
+                <option value="2">2 - Плохо</option>
+                <option value="3">3 - Удовлетворительно</option>
+                <option value="4">4 - Хорошо</option>
+                <option value="5">5 - Отлично</option>
+            </select>
+        </div>
+        
+        <div class="mb-3">
+            <label for="text" class="form-label">Текст рецензии</label>
+            <textarea class="form-control" id="text" rows="5"></textarea>
+            <input type="hidden" id="editor_content" name="text" required>
+        </div>
+        
+        <div class="mb-3">
+            <button type="submit" class="btn btn-primary">Опубликовать рецензию</button>
+            <a href="{{ url_for('view_book', book_id=book.id) }}" class="btn btn-secondary">Отмена</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+<script>
+    const easyMDE = new EasyMDE({
+        element: document.getElementById('text'),
+        spellChecker: false,
+        status: false,
+        toolbar: ['bold', 'italic', 'heading', '|', 'quote', 'unordered-list', 'ordered-list', '|', 'link', '|', 'preview'],
+    });
+
+    document.getElementById('reviewForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        console.log('Form submitted');
+        console.log('Rating:', document.getElementById('rating').value);
+        console.log('Text:', easyMDE.value());
+        
+        document.getElementById('editor_content').value = easyMDE.value();
+        this.submit();
+    });
+</script>
+{% endblock %} 

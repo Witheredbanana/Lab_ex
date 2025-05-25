@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}Мои рецензии - Электронная библиотека{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Мои рецензии</h2>
+    
+    {% if reviews %}
+        {% for review in reviews %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="card-title mb-0">
+                        <a href="{{ url_for('view_book', book_id=review.book.id) }}" class="text-decoration-none">
+                            {{ review.book.title }}
+                        </a>
+                    </h5>
+                    <div class="text-warning">
+                        {% for i in range(review.rating) %}
+                            <i class="fas fa-star"></i>
+                        {% endfor %}
+                        {% for i in range(5 - review.rating) %}
+                            <i class="far fa-star"></i>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <p class="card-text">{{ review.text }}</p>
+                
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        {{ review.created_at.strftime('%d.%m.%Y %H:%M') }}
+                    </small>
+                    <span class="badge {% if review.status.name == 'Одобрено' %}bg-success{% elif review.status.name == 'Отклонено' %}bg-danger{% else %}bg-warning{% endif %}">
+                        {{ review.status.name }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">
+            У вас пока нет рецензий. 
+            <a href="{{ url_for('index') }}" class="alert-link">Перейти к списку книг</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 
