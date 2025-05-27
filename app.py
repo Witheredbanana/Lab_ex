@@ -378,7 +378,8 @@ def statistics():
     # Получаем параметры фильтрации и пагинации
     date_from = request.args.get('date_from')
     date_to = request.args.get('date_to')
-    page = request.args.get('page', 1, type=int)
+    book_page = request.args.get('book_page', 1, type=int)
+    user_page = request.args.get('user_page', 1, type=int)
     per_page = 10
 
     # Базовый запрос для статистики просмотров
@@ -398,7 +399,7 @@ def statistics():
         book_stats_query = book_stats_query.filter(BookVisit.visit_date <= datetime.strptime(date_to, '%Y-%m-%d'))
 
     # Получаем статистику просмотров с пагинацией
-    book_stats = book_stats_query.group_by(Book.id).order_by(db.desc('visit_count')).paginate(page=page, per_page=per_page)
+    book_stats = book_stats_query.group_by(Book.id).order_by(db.desc('visit_count')).paginate(page=book_page, per_page=per_page)
 
     # Базовый запрос для журнала действий пользователей
     user_actions_query = db.session.query(
@@ -414,7 +415,7 @@ def statistics():
         user_actions_query = user_actions_query.filter(BookVisit.visit_date <= datetime.strptime(date_to, '%Y-%m-%d'))
 
     # Получаем журнал действий пользователей с пагинацией
-    user_actions = user_actions_query.order_by(BookVisit.visit_date.desc()).paginate(page=page, per_page=per_page)
+    user_actions = user_actions_query.order_by(BookVisit.visit_date.desc()).paginate(page=user_page, per_page=per_page)
 
     return render_template('statistics.html',
                          book_stats=book_stats,
