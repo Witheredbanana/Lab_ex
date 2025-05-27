@@ -60,14 +60,14 @@
                 <ul class="pagination justify-content-center">
                     {% if user_actions.has_prev %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ url_for('statistics', page=user_actions.prev_num) }}">Предыдущая</a>
+                        <a class="page-link" href="{{ url_for('statistics', user_page=user_actions.prev_num, book_page=book_stats.page, date_from=date_from, date_to=date_to) }}">Предыдущая</a>
                     </li>
                     {% endif %}
                     
                     {% for page_num in user_actions.iter_pages() %}
                         {% if page_num %}
                             <li class="page-item {% if page_num == user_actions.page %}active{% endif %}">
-                                <a class="page-link" href="{{ url_for('statistics', page=page_num) }}">{{ page_num }}</a>
+                                <a class="page-link" href="{{ url_for('statistics', user_page=page_num, book_page=book_stats.page, date_from=date_from, date_to=date_to) }}">{{ page_num }}</a>
                             </li>
                         {% else %}
                             <li class="page-item disabled">
@@ -78,7 +78,7 @@
 
                     {% if user_actions.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ url_for('statistics', page=user_actions.next_num) }}">Следующая</a>
+                        <a class="page-link" href="{{ url_for('statistics', user_page=user_actions.next_num, book_page=book_stats.page, date_from=date_from, date_to=date_to) }}">Следующая</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -156,14 +156,14 @@
                 <ul class="pagination justify-content-center">
                     {% if book_stats.has_prev %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ url_for('statistics', page=book_stats.prev_num, date_from=date_from, date_to=date_to) }}">Предыдущая</a>
+                        <a class="page-link" href="{{ url_for('statistics', book_page=book_stats.prev_num, user_page=user_actions.page, date_from=date_from, date_to=date_to) }}">Предыдущая</a>
                     </li>
                     {% endif %}
                     
                     {% for page_num in book_stats.iter_pages() %}
                         {% if page_num %}
                             <li class="page-item {% if page_num == book_stats.page %}active{% endif %}">
-                                <a class="page-link" href="{{ url_for('statistics', page=page_num, date_from=date_from, date_to=date_to) }}">{{ page_num }}</a>
+                                <a class="page-link" href="{{ url_for('statistics', book_page=page_num, user_page=user_actions.page, date_from=date_from, date_to=date_to) }}">{{ page_num }}</a>
                             </li>
                         {% else %}
                             <li class="page-item disabled">
@@ -174,7 +174,7 @@
 
                     {% if book_stats.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ url_for('statistics', page=book_stats.next_num, date_from=date_from, date_to=date_to) }}">Следующая</a>
+                        <a class="page-link" href="{{ url_for('statistics', book_page=book_stats.next_num, user_page=user_actions.page, date_from=date_from, date_to=date_to) }}">Следующая</a>
                     </li>
                     {% endif %}
                 </ul>
